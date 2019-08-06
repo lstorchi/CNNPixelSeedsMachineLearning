@@ -293,31 +293,31 @@ namespace {
           deltaR   -= copyDoublets.r(iD,layers[j]); deltaR *= -1.0;
           deltaPhi -= phi; deltaPhi *= -1.0;
 
-          TH2F hClust("hClust","hClust",
-          padSize,
-          thisCluster->x()-padSize/2,
-          thisCluster->x()+padSize/2,
-          padSize,
-          thisCluster->y()-padSize/2,
-          thisCluster->y()+padSize/2);
-
-          //Initialization
-          for (int nx = 0; nx < padSize; ++nx)
-          for (int ny = 0; ny < padSize; ++ny)
-          hClust.SetBinContent(nx,ny,0.0);
-
-          for (int k = 0; k < thisCluster->size(); ++k)
-          hClust.SetBinContent(hClust.FindBin((float)thisCluster->pixel(k).x, (float)thisCluster->pixel(k).y),(float)thisCluster->pixel(k).adc);
-
-
-          for (int ny = padSize; ny>0; --ny)
-          {
-            for(int nx = 0; nx<padSize; nx++)
-            {
-              int n = (ny+2)*(padSize + 2) - 2 -2 - nx - padSize; //see TH2 reference for clarification
-              hitPads[j].push_back(hClust.GetBinContent(n));
-            }
-          }
+          // TH2F hClust("hClust","hClust",
+          // padSize,
+          // thisCluster->x()-padSize/2,
+          // thisCluster->x()+padSize/2,
+          // padSize,
+          // thisCluster->y()-padSize/2,
+          // thisCluster->y()+padSize/2);
+          //
+          // //Initialization
+          // for (int nx = 0; nx < padSize; ++nx)
+          // for (int ny = 0; ny < padSize; ++ny)
+          // hClust.SetBinContent(nx,ny,0.0);
+          //
+          // for (int k = 0; k < thisCluster->size(); ++k)
+          // hClust.SetBinContent(hClust.FindBin((float)thisCluster->pixel(k).x, (float)thisCluster->pixel(k).y),(float)thisCluster->pixel(k).adc);
+          //
+          //
+          // for (int ny = padSize; ny>0; --ny)
+          // {
+          //   for(int nx = 0; nx<padSize; nx++)
+          //   {
+          //     int n = (ny+2)*(padSize + 2) - 2 -2 - nx - padSize; //see TH2 reference for clarification
+          //     hitPads[j].push_back(hClust.GetBinContent(n));
+          //   }
+          // }
 
 
           //Pad Initialization
@@ -334,57 +334,57 @@ namespace {
 
         }
 
-        for (int nx = 0; nx < padSize*padSize; ++nx)
-        {
-          inHitPads[layerIds[0]][nx] = hitPads[0][nx];
-        }
-        for (int nx = 0; nx < padSize*padSize; ++nx)
-        {
-          outHitPads[layerIds[1]][nx] = hitPads[1][nx];
-        }
-
-        std::cout << "Inner hit layer : " << innerLayer->seqNum() << " - " << layerIds[0]<< std::endl;
-
-        for(int i = 0; i < cnnLayers; ++i)
-        {
-          std::cout << i << std::endl;
-          auto thisOne = inHitPads[i];
-          for (int nx = 0; nx < padSize; ++nx)
-            for (int ny = 0; ny < padSize; ++ny)
-            {
-              std::cout << thisOne[ny + nx*padSize] << " ";
-            }
-            std::cout << std::endl;
-
-        }
-
-        std::cout << "Outer hit layer : " << outerLayer->seqNum() << " - " << layerIds[1]<< std::endl;
-        for(int i = 0; i < cnnLayers; ++i)
-        {
-          std::cout << i << std::endl;
-          auto thisOne = outHitPads[i];
-          for (int nx = 0; nx < padSize; ++nx)
-            for (int ny = 0; ny < padSize; ++ny)
-            {
-              std::cout << thisOne[ny + nx*padSize ] << " ";
-            }
-            std::cout << std::endl;
-
-        }
-
-        std::cout << "TF Translation" << std::endl;
-        for(int i = 0; i < cnnLayers*2; ++i)
-        {
-          std::cout << i << std::endl;
-          int theOffset = i*padSize*padSize;
-          for (int nx = 0; nx < padSize; ++nx)
-            for (int ny = 0; ny < padSize; ++ny)
-            {
-              std::cout << vPad[(ny + nx*padSize) + theOffset + doubOffset] << " ";
-            }
-            std::cout << std::endl;
-
-        }
+        // for (int nx = 0; nx < padSize*padSize; ++nx)
+        // {
+        //   inHitPads[layerIds[0]][nx] = hitPads[0][nx];
+        // }
+        // for (int nx = 0; nx < padSize*padSize; ++nx)
+        // {
+        //   outHitPads[layerIds[1]][nx] = hitPads[1][nx];
+        // }
+        //
+        // std::cout << "Inner hit layer : " << innerLayer->seqNum() << " - " << layerIds[0]<< std::endl;
+        //
+        // for(int i = 0; i < cnnLayers; ++i)
+        // {
+        //   std::cout << i << std::endl;
+        //   auto thisOne = inHitPads[i];
+        //   for (int nx = 0; nx < padSize; ++nx)
+        //     for (int ny = 0; ny < padSize; ++ny)
+        //     {
+        //       std::cout << thisOne[ny + nx*padSize] << " ";
+        //     }
+        //     std::cout << std::endl;
+        //
+        // }
+        //
+        // std::cout << "Outer hit layer : " << outerLayer->seqNum() << " - " << layerIds[1]<< std::endl;
+        // for(int i = 0; i < cnnLayers; ++i)
+        // {
+        //   std::cout << i << std::endl;
+        //   auto thisOne = outHitPads[i];
+        //   for (int nx = 0; nx < padSize; ++nx)
+        //     for (int ny = 0; ny < padSize; ++ny)
+        //     {
+        //       std::cout << thisOne[ny + nx*padSize ] << " ";
+        //     }
+        //     std::cout << std::endl;
+        //
+        // }
+        //
+        // std::cout << "TF Translation" << std::endl;
+        // for(int i = 0; i < cnnLayers*2; ++i)
+        // {
+        //   std::cout << i << std::endl;
+        //   int theOffset = i*padSize*padSize;
+        //   for (int nx = 0; nx < padSize; ++nx)
+        //     for (int ny = 0; ny < padSize; ++ny)
+        //     {
+        //       std::cout << vPad[(ny + nx*padSize) + theOffset + doubOffset] << " ";
+        //     }
+        //     std::cout << std::endl;
+        //
+        // }
 
         zZero = (siHits[0]->globalState()).position.z();
         zZero -= copyDoublets.r(iD,layers[0]) * (deltaZ/deltaR);
