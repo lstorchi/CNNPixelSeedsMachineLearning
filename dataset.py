@@ -138,7 +138,7 @@ main_pdgs = [11.,13.,211.,321.,2212.]
 
 allLayerPixels = []
 
-    
+
 for i in range(10):
     thisPixels = [ h + "_in_" + str(i) for h in hitPixel]
     allLayerPixels = allLayerPixels + thisPixels
@@ -198,10 +198,10 @@ class Dataset:
 
             if balance:
                 df = balance_data_by_pdg(df,pdgIds)
-            
+
             if(len(df.columns)) == len(dataLab):
-                df.columns = dataLab  
-                
+                df.columns = dataLab
+
             df.sample(frac=1.0)
             self.data = self.data.append(df,sort=True)
 
@@ -214,8 +214,6 @@ class Dataset:
         """ - phi angle"""
         theData = self.data
         dataList = [theData]
-
-        dataList.append(theData)
 
         if phi:
             for i in range(1,magnitude):
@@ -308,9 +306,9 @@ class Dataset:
             (bw_a_in,bw_a_out) = self.b_w_correction(a_in,a_out)
             a_in  = bw_a_in
             a_out = bw_a_out
-        
+
         l = [a_in, a_out]
-        
+
         if angular_correction:
             thetac_in, thetac_out, thetas_in, thetas_out = self.theta_correction(
                 a_in, a_out)
@@ -374,9 +372,9 @@ class Dataset:
 
     def get_info_features(self,labels=featureLabs):
         """ Returns info features as numpy array. """
-        
-        labels = [f for f in labels if f in self.data.columns]  
-        
+
+        labels = [f for f in labels if f in self.data.columns]
+
         return self.data[labels].values
 
     def get_layer_map_data(self,augmentation=1,theta=False,phi=False,bw=False):
@@ -426,7 +424,7 @@ class Dataset:
         y,_= to_categorical(self.get_labels())
 
         return X_hit, X_info, y
-    
+
     def get_layer_map_data_coords(self,theta=False,phi=False,bw=False):
 
         #self.recolumn()
@@ -434,20 +432,20 @@ class Dataset:
 
         a_in = self.data[inPixels].values.astype(np.float16)
         a_out = self.data[outPixels].values.astype(np.float16)
-        
+
         a_in_x = self.data[inPixelsX].values.astype(np.float16).tolist()
         a_in_y = self.data[inPixelsY].values.astype(np.float16).tolist()
         a_in_z = self.data[inPixelsZ].values.astype(np.float16).tolist()
-        
+
         a_out_x = self.data[outPixelsX].values.astype(np.float16).tolist()
         a_out_y = self.data[outPixelsY].values.astype(np.float16).tolist()
         a_out_z = self.data[outPixelsZ].values.astype(np.float16).tolist()
-        
+
         l_coords = [a_in_x,a_in_y,a_in_z,a_out_x,a_out_y,a_out_z]
-    
+
         data_coords = np.array(l_coords)
         data_coords = data_coords.reshape((len(data_coords),-1,padshape,padshape))
- 
+
         a_in = (a_in - mean) / std
         a_out = (a_out - mean) / std
 
@@ -487,7 +485,7 @@ class Dataset:
         y,_= to_categorical(self.get_labels())
 
         return X_hit, X_info, X_coords, y
-    
+
     def first_layer_map_data(self):
 
         #self.recolumn()
@@ -526,8 +524,8 @@ class Dataset:
         a_out = (a_out - mean) / std
 
         l = []
-        
-        
+
+
         thetac_in, thetac_out, thetas_in, thetas_out = self.theta_correction(
             a_in, a_out)
         l = l + [thetac_in, thetac_out, thetas_in, thetas_out]
@@ -609,38 +607,38 @@ class Dataset:
         X_hit = self.get_hit_dense(
             normalize, angular_correction,b_w_correction)
         X_info = self.get_info_features()
-        
-      
-        
+
+
+
         X = np.hstack((X_hit,X_info))
         y = to_categorical(self.get_labels(), num_classes=2)
         return X, y
-    
+
     def get_pix_dense(self, labels = featureLabs, normalize=True, angular_correction=True,b_w_correction=False):
-       
+
         X_info = self.get_info_features(labels)
-        
+
         print(self.data[inPixels].values.astype(np.float16)[0])
-        
+
         X_in = np.sort(self.data[inPixels].values.astype(np.float16),kind="heapsort")[:,-16:]
         X_out = np.sort(self.data[outPixels].values.astype(np.float16),kind="heapsort")[:,-16:]
-        
+
         print(X_in[0])
-        
+
         for x in (X_in,X_out):
             m = np.mean(x)
             s = np.std(x)
             x = x - m
             x = x / s
-        
+
         print(X_in.shape)
         print(X_info.shape)
         print(X_out.shape)
         X = np.hstack((X_in,X_out,X_info))
-        
+
         y,_ = to_categorical(self.get_labels())
         return X, y
-    
+
     def save(self, fname):
         # np.save(fname, self.data.values)
         self.data.to_hdf(fname, 'data', mode='w')
@@ -709,7 +707,7 @@ class Dataset:
 
         self.data = data_excl
         return self # allow method chaining
-    
+
     def balance_by_pdg(self, pdgIds=main_pdgs,maxratio = 5.0,otheratio = 4.0, bkgratio = 1.0):
         """ Balancing datasets by particles. """
         #self.recolumn()
@@ -874,11 +872,11 @@ class DataGenerator:
         return X, y
 
 if __name__ == '__main__':
-    
+
     parser = argparse.ArgumentParser()
     parser.add_argument('--file',type=str,default=None)
     args = parser.parse_args()
-    
+
     if args.file == None:
         print("Please insert file name to be read with --file PATH.")
         print("Exiting.")
@@ -886,7 +884,7 @@ if __name__ == '__main__':
     print("> Reading ", args.file)
 
     d = Dataset([args.file])
- 
+
     batch_size = d.data.values.shape[0]
 
     x = d.get_data()
