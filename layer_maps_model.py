@@ -13,6 +13,9 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard
 from model_architectures import *
 from importlib import reload
 
+from keras import backend as K
+import tensorflow as tf
+
 from random import shuffle
 
 t_now = '{0:%Y-%m-%d_%H-%M-%S}'.format(datetime.datetime.now())
@@ -52,8 +55,8 @@ log_dir_tf = args.log_dir + '/' + args.name
 # "/eos/cms/store/cmst3/group/dehep/convPixels/TTBar_13TeV_PU35/"
 remote_data = args.data
 debug_data  = args.data + "/debug/"
-debug_files = [ debug_data + el for el in os.listdir(debug_data)]     
-               
+debug_files = [ debug_data + el for el in os.listdir(debug_data)]
+
 print("> Loading data ...")
 all_files = [remote_data + el for el in os.listdir(remote_data)]
 shuffle(all_files)
@@ -127,3 +130,8 @@ print('Test loss / test accuracy = {:.4f} / {:.4f}'.format(loss, acc))
 print("> Saving model " + fname)
 model.save_weights(fname + ".h5", overwrite=True)
 
+
+frozen_graph = freeze_session(K.get_session(),
+                              output_names=[out.op.name for out in model.outputs])
+tf.train.write_graph(frozen_graph, "./", fname +".pb", as_text=False)
+tf.train.write_graph(frozen_graph, "./", fname + ".txt", as_text=True)
