@@ -145,7 +145,7 @@ namespace {
       // tensorflow::Tensor inputPads(tensorflow::DT_FLOAT, {numOfDoublets,padSize,padSize,cnnLayers*2});
       tensorflow::Tensor inputFeat(tensorflow::DT_FLOAT, {numOfDoublets,infoSize});
 
-      // float* vPad = inputPads.flat<float>().data();
+      float* vPad = inputPads.flat<float>().data();
       float* vLab = inputFeat.flat<float>().data();
 
       HitDoublets copyDoublets = std::move(thisDoublets);
@@ -335,9 +335,13 @@ namespace {
         }
 
         for (int nx = 0; nx < padSize*padSize; ++nx)
-            inHitPads[layerIds[0]][nx] = hitPads[0][nx];
+        {
+          inHitPads[layerIds[0]][nx] = hitPads[0][nx];
+        }
         for (int nx = 0; nx < padSize*padSize; ++nx)
-            outHitPads[layerIds[1]][nx] = hitPads[1][nx];
+        {
+          outHitPads[layerIds[1]][nx] = hitPads[1][nx];
+        }
 
         std::cout << "Inner hit layer : " << innerLayer->seqNum() << " - " << layerIds[0]<< std::endl;
 
