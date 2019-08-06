@@ -1,0 +1,8 @@
+<use   name="RecoTracker/TkHitPairs"/>
+<use   name="RecoTracker/TkTrackingRegions"/>
+<use   name="RecoPixelVertexing/PixelTriplets"/>
+<use name="tensorrt"/>
+<library   file="*.cc *.cu" name="RecoTrackerTkHitPairsPlugins">
+  <use name="cuda"/>
+  <flags   EDM_PLUGIN="1"/>
+</library>
