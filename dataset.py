@@ -319,6 +319,7 @@ class Dataset:
 
         data = np.array(l)  # (channels, batch_size, hit_size)
         data = data.reshape((len(data), -1, padshape, padshape))
+
         # TODO: not optimal for CPU execution
         return np.transpose(data, (1, 2, 3, 0))
 
@@ -389,6 +390,7 @@ class Dataset:
         a_in = (a_in - mean) / std
         a_out = (a_out - mean) / std
 
+
         if bw:
             (bw_a_in,bw_a_out) = self.b_w_correction(a_in,a_out)
             a_in  = bw_a_in
@@ -410,10 +412,14 @@ class Dataset:
 
             for id_layer in layer_ids:
                 layer_hits = np.zeros(hits.shape)
+                #print(layer_hits)
                 bool_mask = ids == id_layer
                 layer_hits[bool_mask, :] = hits[bool_mask, :]
+                #print(layer_hits)
+                #print()
                 l.append(layer_hits)
-
+            print(l)
+            print()
         data = np.array(l)  # (channels, batch_size, hit_size)
         data = data.reshape((len(data), -1, padshape, padshape))
         X_hit = np.transpose(data, (1, 2, 3, 0))
@@ -600,7 +606,7 @@ class Dataset:
         X_hit = self.get_hit_shapes(
             normalize, angular_correction,b_w_correction)
         X_info = self.get_info_features()
-        y = to_categorical(self.get_labels(), num_classes=2)
+        y,_ = to_categorical(self.get_labels(), num_classes=2)
         return X_hit, X_info, y
 
     def get_data_dense(self, normalize=True, angular_correction=True, b_w_correction=False):

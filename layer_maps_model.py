@@ -12,6 +12,9 @@ from dataset import Dataset
 from keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard
 from model_architectures import *
 from importlib import reload
+from sklearn.metrics import roc_curve
+from sklearn.metrics import auc
+import matplotlib.pyplot as plt 
 
 from keras import backend as K
 import tensorflow as tf
@@ -70,7 +73,7 @@ if args.debug:
     test_files = all_files[:1]
     train_files = all_files[:1]
     val_files = all_files[:1]
-    train_data = Dataset(train_files)
+    train_data = Dataset(train_files,numofr =1)
     val_data = train_data
     test_data = train_data
     args.n_epochs = 2
@@ -84,9 +87,13 @@ train_data = train_data.balance_data()
 val_data = val_data.balance_data()
 test_data = test_data
 
-X_hit, X_info, y = train_data.get_layer_map_data()
-X_val_hit, X_val_info, y_val = val_data.get_layer_map_data()
-X_test_hit, X_test_info, y_test = test_data.get_layer_map_data()
+#X_hit, X_info, y = train_data.get_layer_map_data()
+#X_val_hit, X_val_info, y_val = val_data.get_layer_map_data()
+#X_test_hit, X_test_info, y_test = test_data.get_layer_map_data()
+
+X_hit, X_info, y = train_data.get_data(angular_correction=False)
+X_val_hit, X_val_info, y_val = val_data.get_data(angular_correction=False)
+X_test_hit, X_test_info, y_test = test_data.get_data(angular_correction=False)
 
 print("Training size: " + str(X_hit.shape[0]))
 print("Val size: " + str(X_val_hit.shape[0]))
@@ -96,9 +103,12 @@ train_input_list = [X_hit, X_info]
 val_input_list = [X_val_hit, X_val_info]
 test_input_list = [X_test_hit, X_test_info]
 
-print(train_input_list[0].shape[-1])
+print(train_input_list[0].shape)
+print(val_input_list[0].shape)
+print(test_input_list[0].shape)
 
-model = small_doublet_model(args, train_input_list[0].shape[-1],train_input_list[1].shape[-1])
+#model = small_doublet_model(args, train_input_list[0].shape[-1],train_input_list[1].shape[-1])
+model = dense_model(args, train_input_list[0].shape[-1],train_input_list[1].shape[-1])
 
 if args.verbose:
     model.summary()
@@ -125,6 +135,35 @@ model.load_weights(fname + ".h5")
 
 loss, acc = model.evaluate(test_input_list, y_test, batch_size=args.batch_size)
 print('Test loss / test accuracy = {:.4f} / {:.4f}'.format(loss, acc))
+
+y_pred_keras = model.predict(test_input_list)
+fpr_keras, tpr_keras, thresholds_keras = roc_curve(y_test[:,0], y_pred_keras[:,0])
+auc_keras = auc(fpr_keras, tpr_keras)
+print('ROC - AUC = {:.4f}'.format(auc_keras))
+plt.figure(1)
+#plt.plot([0, 1], [0, 1], 'k--')
+plt.plot(fpr_keras, tpr_keras, label=args.name+' (area = {:.3f})'.format(auc_keras))
+#plt.plot(fpr_rf, tpr_rf, label='RF (area = {:.3f})'.format(auc_rf))
+plt.xlabel('False positive rate')
+plt.ylabel('True positive rate')
+plt.title('ROC curve')
+plt.legend(loc='best')
+plt.grid()
+plt.savefig('ROC_'+args.name)
+'''
+# Zoom in view of the upper left corner.
+plt.figure(2)
+plt.xlim(0, 0.2)
+plt.ylim(0.8, 1)
+plt.plot([0, 1], [0, 1], 'k--')
+plt.plot(fpr_keras, tpr_keras, label='Keras (area = {:.3f})'.format(auc_keras))
+plt.plot(fpr_rf, tpr_rf, label='RF (area = {:.3f})'.format(auc_rf))
+plt.xlabel('False positive rate')
+plt.ylabel('True positive rate')
+plt.title('ROC curve (zoomed in at top left)')
+plt.legend(loc='best')
+plt.show()
+'''
 
 
 print("> Saving model " + fname)
